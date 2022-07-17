@@ -3,6 +3,10 @@
 
 #include "stb_image.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <iostream>
 using namespace std;
 
@@ -25,8 +29,9 @@ const char *vtShaderSrc =
 "layout(location = 2) in vec2 aTexCord;\n"
 "out vec3 ourColor;\n"
 "out vec2 ourTexCord;\n"
+"uniform mat4 transform;\n"
 "void main() {\n"
-"gl_Position = vec4(aPos,1.0);\n"
+"gl_Position = transform * vec4(aPos,1.0);\n"
 "ourColor = aColor;\n"
 "ourTexCord = aTexCord;\n"
 "};\0";
@@ -180,6 +185,15 @@ int main() {
         glBindVertexArray(VAO);
 
         glUseProgram(shaderProg);
+
+        //glm
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
+
+        glUniformMatrix4fv(glGetUniformLocation(shaderProg, "transform"),
+            1,
+            GL_FALSE,
+            glm::value_ptr(trans));
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D,texture1);
